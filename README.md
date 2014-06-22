@@ -43,7 +43,7 @@ The output of this command can be used as input for subrange repair.
 ## Example
 
 ```
-java -jar target/cassandra-list-subtranges-0.0.1-SNAPSHOT.jar 55.233.44.168 myks mycf
+java -jar target/cassandra-list-subtranges-0.0.2-SNAPSHOT.jar 55.233.44.168 myks mycf
 
 Start Token                             End Token                               Estimated Size
 ------------------------------------------------------------------------------------------------
