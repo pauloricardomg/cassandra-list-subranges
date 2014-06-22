@@ -19,12 +19,12 @@ Before using the tool, compile it using the following command:
 
 In order to print a list of subranges from `<startToken>` to `<endToken>` of the column family `<ks>`.`<cf>` containing approximately `<keysPerSplit>` keys:
 
-`java -jar target/cassandra-list-subranges-0.0.1-SNAPSHOT.jar <host> <ks> <cf> <keysPerSplit> <startToken> <endToken>`
+`java -jar target/cassandra-list-subranges-0.0.1.jar <host> <ks> <cf> <keysPerSplit> <startToken> <endToken>`
 
 ## Example
 
 ```
-java -jar target/cassandra-list-subtranges-0.0.1-SNAPSHOT.jar cas01.myorganization.com myks mycf 131072 63802943797675961899382738893456539648 0
+java -jar target/cassandra-list-subtranges-0.0.1.jar cas01.myorganization.com myks mycf 131072 63802943797675961899382738893456539648 0
 Start Token                             End Token                               Estimated Size
 ------------------------------------------------------------------------------------------------
 63802943797675961899382738893456539648  149754238816874633134119387290723465869 143104
