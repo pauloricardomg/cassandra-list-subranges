@@ -15,28 +15,46 @@ Before using the tool, compile it using the following command:
 
 `mvn package`
 
+## Supported Cassandra versions
+
+The project is configured by default to use Cassandra 1.2.16.
+
+In order to compile for Cassandra 2.0.X, modify the `<version>` attribute on the "org.apache.cassandra" pom.xml dependency.
+
 # Usage
 
-In order to print a list of subranges from `<startToken>` to `<endToken>` of the column family `<ks>`.`<cf>` containing approximately `<keysPerSplit>` keys:
+```
+usage: java -jar list-subranges.jar <nodeIpAddress> <keySpace> <columnFamily>
 
-`java -jar target/cassandra-list-subranges-0.0.1-SNAPSHOT.jar <host> <ks> <cf> <keysPerSplit> <startToken> <endToken>`
+Lists CF subranges for a particular node or token range.
+
+The output of this command can be used as input for subrange repair.
+ -et,--end-token <arg>       Calculate subranges of the range with this
+                             end token.
+ -n,--num-partitions <arg>   Number of partitions per subsplit. (default
+                             32K)
+ -o,--omit-header            Number of partitions per subsplit.
+ -pr,--partitioner-range     Only consider the first range returned by the
+                             partitioner.
+ -st,--start-token <arg>     Calculate subranges of the range with this
+                             start token.
+```
 
 ## Example
 
 ```
-java -jar target/cassandra-list-subtranges-0.0.1-SNAPSHOT.jar cas01.myorganization.com myks mycf 131072 63802943797675961899382738893456539648 0
+java -jar target/cassandra-list-subtranges-0.0.1-SNAPSHOT.jar 55.233.44.168 myks mycf
+
 Start Token                             End Token                               Estimated Size
 ------------------------------------------------------------------------------------------------
-63802943797675961899382738893456539648  149754238816874633134119387290723465869 143104
-149754238816874633134119387290723465869 152013523477421711727827521695475332900 142848
-152013523477421711727827521695475332900 154281943151324548043651808333706143715 143104
-154281943151324548043651808333706143715 156541576535381173370881008574335517403 143104
-156541576535381173370881008574335517403 158816604589252895925877576316314875294 143104
-158816604589252895925877576316314875294 161084626211083094460372545763704903422 142848
-161084626211083094460372545763704903422 163344524859451337986502817760913554356 143104
-163344524859451337986502817760913554356 165610655324890521603059310862092462338 143104
-165610655324890521603059310862092462338 167873178207697024732810598654736421921 142848
-167873178207697024732810598654736421921 0                                       143104
+74436767763955288882613195375699296256  74439973730150275837031561482829976149  32768
+74439973730150275837031561482829976149  74443147299065436464785732203520768529  32768
+74443147299065436464785732203520768529  74446308864678424144281808412855325434  32768
+74446308864678424144281808412855325434  74449503757202033309267324422423573442  32768
+74449503757202033309267324422423573442  74452743303842114263527346967989205341  32768
+74452743303842114263527346967989205341  74455939694977870753656687218158491917  32768
+74455939694977870753656687218158491917  74459152093479228618429026679825938232  32768
+74459152093479228618429026679825938232  74462336296486462312787078846957455213  32768
 ```
 
 # Subrange repair
