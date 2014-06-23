@@ -28,6 +28,7 @@ public class ListSubRanges {
     private static final String START_TOKEN_OPT = "start-token";
     private static final String END_TOKEN_OPT = "end-token";
     private static final String PARTITIONS_OPT = "num-partitions";
+    private static final String CASSANDRA_LISTEN_ADDRESS_OPT = "listen-address";
     private static final String OMIT_HEADER_OPT = "omit-header";
     private static final Options options;
     static {
@@ -36,6 +37,8 @@ public class ListSubRanges {
                 "Calculate subranges of the range with this start token.");
         options.addOption("et", END_TOKEN_OPT, true,
                 "Calculate subranges of the range with this end token.");
+        options.addOption("l", CASSANDRA_LISTEN_ADDRESS_OPT, true,
+                "Node listen address (if different from broadcast address). (default: nodeIpAddress)");
         options.addOption("pr", PARTITIONER_RANGE_OPT, false,
                 "Only consider the first range returned by the partitioner.");
         options.addOption("n", PARTITIONS_OPT, true,
@@ -45,6 +48,7 @@ public class ListSubRanges {
     }
 
     static Cassandra.Client client;
+    static String nodeListenAddress;
     static String nodeIp;
     static String keyspace;
     static String columnFamily;
@@ -109,7 +113,7 @@ public class ListSubRanges {
     }
 
     private static void initClient() throws InvalidRequestException, TException {
-        TTransport tr = new TFramedTransport(new TSocket(nodeIp, 9160));
+        TTransport tr = new TFramedTransport(new TSocket(nodeListenAddress, 9160));
         tr.open();
         client = new Cassandra.Client(new TBinaryProtocol(tr));
         client.set_keyspace(keyspace);
@@ -124,6 +128,7 @@ public class ListSubRanges {
         columnFamily = args[2];
 
         keysPerSplit = Integer.valueOf(cmdLine.getOptionValue(PARTITIONS_OPT, DEFAULT_NUMBER_OF_PARTITIONS));
+        nodeListenAddress = cmdLine.getOptionValue(CASSANDRA_LISTEN_ADDRESS_OPT, nodeIp);
         startToken = cmdLine.getOptionValue(START_TOKEN_OPT);
         endToken = cmdLine.getOptionValue(END_TOKEN_OPT);
         firstRangeOnly = cmdLine.hasOption(PARTITIONER_RANGE_OPT);
