@@ -3,6 +3,9 @@ package br.com.chaordic.cassandra;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.cassandra.thrift.AuthenticationException;
+import org.apache.cassandra.thrift.AuthenticationRequest;
+import org.apache.cassandra.thrift.AuthorizationException;
 import org.apache.cassandra.thrift.Cassandra;
 import org.apache.cassandra.thrift.CfSplit;
 import org.apache.cassandra.thrift.EndpointDetails;
@@ -20,6 +23,8 @@ import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 
+import com.google.common.collect.ImmutableMap;
+
 public class ListSubRanges {
 
 
@@ -30,6 +35,8 @@ public class ListSubRanges {
     private static final String PARTITIONS_OPT = "num-partitions";
     private static final String CASSANDRA_LISTEN_ADDRESS_OPT = "listen-address";
     private static final String OMIT_HEADER_OPT = "omit-header";
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "password";
     private static final Options options;
     static {
         options = new Options();
@@ -45,6 +52,10 @@ public class ListSubRanges {
                 "Number of partitions per subsplit. (default 32K)");
         options.addOption("o", OMIT_HEADER_OPT, false,
                 "Number of partitions per subsplit.");
+        options.addOption("u", USERNAME, false,
+                "Username to authenticate with.");
+        options.addOption("p", PASSWORD, false,
+                "Password to authenticate with.");
     }
 
     static Cassandra.Client client;
@@ -55,6 +66,8 @@ public class ListSubRanges {
     static int keysPerSplit;
     static String startToken;
     static String endToken;
+    static String username;
+    static String password;
 
     static boolean firstRangeOnly;
     static boolean omitHeader;
@@ -66,7 +79,7 @@ public class ListSubRanges {
         }
 
         parseOpts(args);
-        initClient();
+        initClient(username, password);
 
         if (!omitHeader) {
             printHeader();
@@ -112,11 +125,16 @@ public class ListSubRanges {
         return nodeRanges;
     }
 
-    private static void initClient() throws InvalidRequestException, TException {
+    private static void initClient(String username, String password) throws InvalidRequestException, TException,
+        AuthenticationException, AuthorizationException {
         TTransport tr = new TFramedTransport(new TSocket(nodeListenAddress, 9160));
         tr.open();
         client = new Cassandra.Client(new TBinaryProtocol(tr));
         client.set_keyspace(keyspace);
+
+        if(username != null && password != null) {
+            client.login(new AuthenticationRequest(ImmutableMap.of("username", username, "password", password)));
+        }
     }
 
     private static void parseOpts(String[] args) throws ParseException {
