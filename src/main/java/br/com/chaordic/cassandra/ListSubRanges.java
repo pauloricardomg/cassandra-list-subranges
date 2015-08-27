@@ -88,7 +88,9 @@ public class ListSubRanges {
             throws InvalidRequestException, TException {
         List<CfSplit> cfSplits = client.describe_splits_ex(columnFamily, startToken, endToken, keysPerSplit);
         for (CfSplit cfSplit : cfSplits) {
-            System.out.printf("%s %s %d\n", cfSplit.start_token, cfSplit.end_token, cfSplit.row_count);
+            String st = String.format("%1$-39s", cfSplit.start_token);
+            String et = String.format("%1$-39s", cfSplit.end_token);
+            System.out.printf("%s %s %d\n", st, et, cfSplit.row_count);
         }
     }
 
